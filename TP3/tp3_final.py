@@ -546,23 +546,33 @@ respondieron_2024 = respondieron[respondieron['ano4'] == 2024].reset_index(drop=
 # Proporción de desocupados por nivel educativo
 # 2004:
 
+total2004 = respondieron_2004.groupby('nivel_ed')['nivel_ed'].count() # calculamos las personas totales por nivel educativo
+desocupados2004 = respondieron_2004[respondieron_2004['desocupado'] == 1].groupby('nivel_ed')['desocupado'].count() # cantidad de desocupados por nivele educativo
+proporcion_desocupados2004 = desocupados2004 / total2004 # hacemos la proporción de desocupados por nivel educativo
 
-
-total_por_nivel = respondieron_2004.groupby('nivel_ed')['nivel_ed'].count()
-# 2. Contamos los desocupados por nivel educativo
-desocupados_por_nivel = respondieron_2004[respondieron_2004['desocupado'] == 1].groupby('nivel_ed')['desocupado'].count()
-# 3. Calculamos la proporción de desocupados por nivel educativo
-proporcion_desocupados = desocupados_por_nivel / total_por_nivel
 # Mostramos los resultados
-print(proporcion_desocupados)
+print(proporcion_desocupados2004)
+
+# 2024 
+total2024 = respondieron_2024.groupby('nivel_ed')['nivel_ed'].count() # calculamos las personas totales por nivel educativo
+desocupados2024 = respondieron_2024[respondieron_2024['desocupado'] == 1].groupby('nivel_ed')['desocupado'].count() # cantidad de desocupados por nivele educativo
+proporcion_desocupados2024 = desocupados2024 / total2024 # hacemos la proporción de desocupados por nivel educativo
+# Mostramos los resultados
+print(proporcion_desocupados2024)
 
 
+# Combinamos las proporciones en una tabla
+tabla_combinada = pd.DataFrame({
+    'Nivel Educativo': proporcion_desocupados2004.index,
+    'Proporción Desocupados 2004': proporcion_desocupados2004.values,
+    'Proporción Desocupados 2024': proporcion_desocupados2024.values
+})
 
+print(tabla_combinada)
 
+# Exportamos la tabla combinada a LaTeX
+tabla_combinada.to_latex("output/tabla_6a.tex", index=False)
 
-
-# Exportamos a Latex
-agg_desocup_combined.to_latex("output/tabla_6a.tex", index=True)
 
 #______________________________________________________________________________________________________________________________#
 # 
@@ -582,37 +592,39 @@ labels = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', 
 # Creamos una variable que se llama edad_categoría
 # Primero usamos la función pd.cut para categorizar la edad basada en los bins y labels que definimos
 respondieron_2004['edad_categoria'] = pd.cut(respondieron_2004['ch06'], bins=bins, labels=labels, right=False)
+# Calculamos la proporción de desocupados por categoría de edad
+total_edad_2004 = respondieron_2004.groupby('edad_categoria')['edad_categoria'].count()  # Total de personas por categoría de edad
+desocupados_edad_2004 = respondieron_2004[respondieron_2004['desocupado'] == 1].groupby('edad_categoria')['desocupado'].count()  # Desocupados por categoría de edad
+# Calculamos la proporción de desocupados por categoría de edad
+proporcion_desocupados2004 = desocupados_edad_2004 / total_edad_2004
+# Mostramos los resultados
+print(proporcion_desocupados2004)
 
-# Filtramos la base para obtener solo los individuos desocupados
-agg_desocup_2004 = respondieron_2004.loc[respondieron_2004['desocupado'] == 1].groupby(['edad_categoria'], observed=True).agg(count=('desocupado', 'size'))
 
-# Calcular la proporción de desocupados en cada categoría de edad
-agg_desocup_2004['proporcion 2004'] = agg_desocup_2004['count'] / agg_desocup_2004['count'].sum()
-
-print(agg_desocup_2004)
-
-# 2024: (mismo que 2004)
+# 2024: 
 # Creamos una variable que se llama edad_categoría
-# Primero usamos la función pd.cut para categorizar la edad basada en los bins y labels que definimos
 respondieron_2024['edad_categoria'] = pd.cut(respondieron_2024['ch06'], bins=bins, labels=labels, right=False)
+# Calculamos la proporción de desocupados por categoría de edad
+total_edad_2024 = respondieron_2024.groupby('edad_categoria')['edad_categoria'].count()  # Total de personas por categoría de edad
+desocupados_edad_2024 = respondieron_2024[respondieron_2024['desocupado'] == 1].groupby('edad_categoria')['desocupado'].count()  # Desocupados por categoría de edad
+# Calculamos la proporción de desocupados por categoría de edad
+proporcion_desocupados2024 = desocupados_edad_2024 / total_edad_2024
+# Mostramos los resultados
+print(proporcion_desocupados2024)
 
-# Filtramos la base para obtener solo los individuos desocupados
-agg_desocup_2024 = respondieron_2024.loc[respondieron_2024['desocupado'] == 1].groupby(['edad_categoria'], observed=True).agg(count=('desocupado', 'size'))
 
-# Calcular la proporción de desocupados en cada categoría de edad
-agg_desocup_2024['proporcion 2024'] = agg_desocup_2024['count'] / agg_desocup_2024['count'].sum()
-print(agg_desocup_2024)
+# Combinamos las proporciones en una tabla
+tabla_combinada = pd.DataFrame({
+    'Edad': proporcion_desocupados2004.index,
+    'Proporción Desocupados 2004': proporcion_desocupados2004.values,
+    'Proporción Desocupados 2024': proporcion_desocupados2024.values
+})
 
-# Unimos los dataframes en uno
-agg_desocup_combined = pd.merge(agg_desocup_2004[['proporcion 2004']], 
-                                agg_desocup_2024[['proporcion 2024']], 
-                                left_index=True, right_index=True, how='outer')
+print(tabla_combinada)
 
-# Vemos el resultado
-print(agg_desocup_combined)
+# Exportamos la tabla combinada a LaTeX
+tabla_combinada.to_latex("output/tabla_6b.tex", index=False)
 
-# Exportamos a Latex
-agg_desocup_combined.to_latex("output/tabla_6b.tex", index=True)
 
 
 #_______________________________________________________________________________________#
