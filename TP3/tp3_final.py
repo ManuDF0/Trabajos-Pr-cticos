@@ -545,31 +545,24 @@ respondieron_2024 = respondieron[respondieron['ano4'] == 2024].reset_index(drop=
 
 # Proporción de desocupados por nivel educativo
 # 2004:
-# Filtramos los datos para obtener solo las filas donde 'desocupado' es igual a 1
-agg_desocup_2004 = respondieron_2004.loc[respondieron_2004['desocupado'] == 1]
-# Agrupamos el DataFrame filtrado por 'nivel_ed' 
-agg_desocup_2004 = agg_desocup_2004.groupby(['nivel_ed'], observed=True).agg(count=('desocupado', 'count')) # contabilizamos la cantidad de desocupados por grupo
-# Calculamos la proporción de desocupados por nivel educativo
-agg_desocup_2004['proporcion 2004'] = agg_desocup_2004['count'] / agg_desocup_2004['count'].sum() # dividimos la cantidad de desocupados de cada nivel por el total de desocupados
-print(agg_desocup_2004) # vemos resultado
 
-# 2024 (mismo que para 2004)
-agg_desocup_2024 = respondieron_2024.loc[respondieron_2024['desocupado'] == 1]
-agg_desocup_2024 = agg_desocup_2024.groupby(['nivel_ed'], observed=True).agg(count=('desocupado', 'count')) 
-agg_desocup_2024['proporcion 2024'] = agg_desocup_2024['count'] / agg_desocup_2024['count'].sum() 
-print(agg_desocup_2024) # vemos resultado
 
-# Unimos los dataframes en uno
-agg_desocup_combined = pd.merge(agg_desocup_2004[['proporcion 2004']], 
-                                agg_desocup_2024[['proporcion 2024']], 
-                                left_index=True, right_index=True, how='outer')
 
-# Vemos el resultado
-print(agg_desocup_combined)
+total_por_nivel = respondieron_2004.groupby('nivel_ed')['nivel_ed'].count()
+# 2. Contamos los desocupados por nivel educativo
+desocupados_por_nivel = respondieron_2004[respondieron_2004['desocupado'] == 1].groupby('nivel_ed')['desocupado'].count()
+# 3. Calculamos la proporción de desocupados por nivel educativo
+proporcion_desocupados = desocupados_por_nivel / total_por_nivel
+# Mostramos los resultados
+print(proporcion_desocupados)
+
+
+
+
+
 
 # Exportamos a Latex
 agg_desocup_combined.to_latex("output/tabla_6a.tex", index=True)
-
 
 #______________________________________________________________________________________________________________________________#
 # 
