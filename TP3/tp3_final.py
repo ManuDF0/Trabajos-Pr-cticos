@@ -295,9 +295,8 @@ plt.show()
 # Generamos dummies con este comando 
 datos_bb_dummies = pd.get_dummies(datos_bb, columns=['ch04', 'ch07', 'nivel_ed', 'estado', 'cat_inac'], drop_first=True) 
 
-# Eliminamos las variables que no nos sirven para la matriz de correlación
+# Eliminamos variable que no nos sirve para la matriz de correlación
 datos_bb_dummies.drop('codusu', axis=1, inplace=True) 
-datos_bb_dummies.drop('ano4', axis=1, inplace=True)
 
 # La función de get_dummies pone "drop_first" = True porque elimina la primera categoría de cada variable para tomarla como categoría base
 # Comentario: aunque la variable ch04 (sexo) ya sea una dummy, generamos igualmente otra dummy porque preferimos que las dummies sean 0-1, y no 1-2
@@ -437,7 +436,67 @@ respondieron['pea'] = np.where(respondieron['estado'].isin(['Ocupado', 'Desocupa
 print(respondieron['pea'].dtype) # es del tipo numérica
 respondieron['pea'] = respondieron['pea'].astype('category') # pasamos a tipo categórico 
 
-# FALTA GRÁFICO 
+# Separamos en dos bases, una para 2004 y otra para 2024
+respondieron_2004 = respondieron[respondieron['ano4'] == 2004].reset_index(drop=True) # con el reset_index volvemos a setear bien los índices
+respondieron_2024 = respondieron[respondieron['ano4'] == 2024].reset_index(drop=True)
+
+# Porcentajes
+respondieron_2004_counts = respondieron_2004['pea'].value_counts(normalize=True) * 100
+respondieron_2024_counts = respondieron_2024['pea'].value_counts(normalize=True) * 100
+
+# DEFINIMOS FUNCIÓN PARA GRÁFICOS DE BARRAS: 
+def composicion_bar(val_2004, val_2024, x_label, label_2004_1, label_2004_2, label_2024_1, label_2024_2): 
+    fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # Crea una figura con 2 subgráficos, uno al lado del otro
+
+    # Gráfico para 2004: 
+    bars_2004 = axs[0].bar(val_2004.index, val_2004.values, color='skyblue')
+    axs[0].set_title('Composición en 2004')  # Título para el gráfico de 2004
+    axs[0].set_ylabel('Porcentaje')  # Etiqueta en el eje Y
+    axs[0].set_ylim(0, 100)  # Limita los valores en el eje Y entre 0 y 100 (porcentaje)
+
+    # Eliminamos las rayas y números del eje X
+    axs[0].set_xticks([])  # Eliminmos los ticks del eje x
+    axs[0].set_xlabel('')  # Elimina la etiqueta "Estado" en el eje X
+
+    # Añade el porcentaje arriba de las barras en 2004
+    axs[0].text(bars_2004[0].get_x() + bars_2004[0].get_width() / 2, val_2004.values[0] + 2, f'{val_2004.values[0]:.1f}%', ha='center') 
+    axs[0].text(bars_2004[1].get_x() + bars_2004[1].get_width() / 2, val_2004.values[1] + 2, f'{val_2004.values[1]:.1f}%', ha='center') 
+
+    # Añade las etiquetas debajo de las barras en 2004, sin los ":"
+    axs[0].text(bars_2004[0].get_x() + bars_2004[0].get_width() / 2, -5, f'{label_2004_1}', ha='center') 
+    axs[0].text(bars_2004[1].get_x() + bars_2004[1].get_width() / 2, -5, f'{label_2004_2}', ha='center') 
+
+    # Gráfico para 2024: 
+    bars_2024 = axs[1].bar(val_2024.index, val_2024.values, color='salmon')
+    axs[1].set_title('Composición en 2024')  # Título para el gráfico de 2024
+    axs[1].set_ylabel('Porcentaje')  # Etiqueta el eje Y
+    axs[1].set_ylim(0, 100)  # Limita los valores en el eje Y entre 0 y 100 (porcentaje)
+
+    # Eliminamos las rayas y números del eje X
+    axs[1].set_xticks([])  # Eliminamos los ticks del eje X
+    axs[1].set_xlabel('')  # Eliminamos etiqueta del eje x
+
+    # Añade el porcentaje arriba de las barras en 2024
+    axs[1].text(bars_2024[0].get_x() + bars_2024[0].get_width() / 2, val_2024.values[0] + 2, f'{val_2024.values[0]:.1f}%', ha='center') 
+    axs[1].text(bars_2024[1].get_x() + bars_2024[1].get_width() / 2, val_2024.values[1] + 2, f'{val_2024.values[1]:.1f}%', ha='center') 
+
+    # Agregamos las etiquetas
+    axs[1].text(bars_2024[0].get_x() + bars_2024[0].get_width() / 2, -5, f'{label_2024_1}', ha='center') 
+    axs[1].text(bars_2024[1].get_x() + bars_2024[1].get_width() / 2, -5, f'{label_2024_2}', ha='center') 
+    
+    plt.tight_layout()  # Ajustamos automáticamente el espacio entre los subgráficos
+
+    plt.show()  
+    return fig
+
+# Aplicamos la función para ambos años: 
+grafico4 = composicion_bar(respondieron_2004_counts, respondieron_2024_counts, 'Estado', 
+                'PEA', 'NO PEA', 
+                'PEA', 'NO PEA')
+
+
+# Guardamos el gráfico como archivo PNG
+grafico4.savefig('output/grafico4.png', bbox_inches='tight')
 
 #_____________________________________________________________________________________________________________________________________________________________#
 # 
@@ -448,11 +507,25 @@ respondieron['pea'] = respondieron['pea'].astype('category') # pasamos a tipo ca
 #_____________________________________________________________________________________________________________________________________________________________#
 
 # Creamos la variable PET
-respondieron['pet'] = np.where((respondieron['ch06'] >= 15) & (respondieron['ch06'] <= 65), 1, 0)
+respondieron['pet'] = np.where((respondieron['ch06'] > 15) & (respondieron['ch06'] < 65), 1, 0)
 print(respondieron['pet'].dtype) # es del tipo numérica
 respondieron['pet'] = respondieron['pet'].astype('category') # pasamos a tipo categórica 
 
-# FALTA GRÁFICO 
+# Separamos en dos bases, una para 2004 y otra para 2024
+respondieron_2004 = respondieron[respondieron['ano4'] == 2004].reset_index(drop=True) # con el reset_index volvemos a setear bien los índices
+respondieron_2024 = respondieron[respondieron['ano4'] == 2024].reset_index(drop=True)
+
+# Porcentajes
+respondieron_2004_counts = respondieron_2004['pet'].value_counts(normalize=True) * 100
+respondieron_2024_counts = respondieron_2024['pet'].value_counts(normalize=True) * 100
+
+# Volvemos a aplicar la función para ambos años: 
+grafico5 = composicion_bar(respondieron_2004_counts, respondieron_2024_counts, 'Estado', 
+                'PET', 'NO PET', 
+                'PET', 'NO PET')
+
+# Guardamos el gráfico como archivo PNG
+grafico5.savefig('output/grafico5.png', bbox_inches='tight')
 
 #______________________________________________________________________________________________________________________________#
 # 
@@ -471,23 +544,32 @@ respondieron_2004 = respondieron[respondieron['ano4'] == 2004].reset_index(drop=
 respondieron_2024 = respondieron[respondieron['ano4'] == 2024].reset_index(drop=True)
 
 # Proporción de desocupados por nivel educativo
-
 # 2004:
 # Filtramos los datos para obtener solo las filas donde 'desocupado' es igual a 1
 agg_desocup_2004 = respondieron_2004.loc[respondieron_2004['desocupado'] == 1]
 # Agrupamos el DataFrame filtrado por 'nivel_ed' 
 agg_desocup_2004 = agg_desocup_2004.groupby(['nivel_ed'], observed=True).agg(count=('desocupado', 'count')) # contabilizamos la cantidad de desocupados por grupo
 # Calculamos la proporción de desocupados por nivel educativo
-agg_desocup_2004['proporcion'] = agg_desocup_2004['count'] / agg_desocup_2004['count'].sum() # dividimos la cantidad de desocupados de cada nivel por el total de desocupados
+agg_desocup_2004['proporcion 2004'] = agg_desocup_2004['count'] / agg_desocup_2004['count'].sum() # dividimos la cantidad de desocupados de cada nivel por el total de desocupados
 print(agg_desocup_2004) # vemos resultado
 
 # 2024 (mismo que para 2004)
 agg_desocup_2024 = respondieron_2024.loc[respondieron_2024['desocupado'] == 1]
 agg_desocup_2024 = agg_desocup_2024.groupby(['nivel_ed'], observed=True).agg(count=('desocupado', 'count')) 
-agg_desocup_2024['proporcion'] = agg_desocup_2024['count'] / agg_desocup_2024['count'].sum() 
+agg_desocup_2024['proporcion 2024'] = agg_desocup_2024['count'] / agg_desocup_2024['count'].sum() 
 print(agg_desocup_2024) # vemos resultado
 
-# FALTA SACAR TABLITAS/GRÁFICOS (CAPAZ ES MEJOR VERLO CON GRÁFICO)
+# Unimos los dataframes en uno
+agg_desocup_combined = pd.merge(agg_desocup_2004[['proporcion 2004']], 
+                                agg_desocup_2024[['proporcion 2024']], 
+                                left_index=True, right_index=True, how='outer')
+
+# Vemos el resultado
+print(agg_desocup_combined)
+
+# Exportamos a Latex
+agg_desocup_combined.to_latex("output/tabla_6a.tex", index=True)
+
 
 #______________________________________________________________________________________________________________________________#
 # 
@@ -512,7 +594,7 @@ respondieron_2004['edad_categoria'] = pd.cut(respondieron_2004['ch06'], bins=bin
 agg_desocup_2004 = respondieron_2004.loc[respondieron_2004['desocupado'] == 1].groupby(['edad_categoria'], observed=True).agg(count=('desocupado', 'size'))
 
 # Calcular la proporción de desocupados en cada categoría de edad
-agg_desocup_2004['proporcion'] = agg_desocup_2004['count'] / agg_desocup_2004['count'].sum()
+agg_desocup_2004['proporcion 2004'] = agg_desocup_2004['count'] / agg_desocup_2004['count'].sum()
 
 print(agg_desocup_2004)
 
@@ -522,14 +604,23 @@ print(agg_desocup_2004)
 respondieron_2024['edad_categoria'] = pd.cut(respondieron_2024['ch06'], bins=bins, labels=labels, right=False)
 
 # Filtramos la base para obtener solo los individuos desocupados
-agg_desocup_2024 = respondieron_2004.loc[respondieron_2024['desocupado'] == 1].groupby(['edad_categoria'], observed=True).agg(count=('desocupado', 'size'))
+agg_desocup_2024 = respondieron_2024.loc[respondieron_2024['desocupado'] == 1].groupby(['edad_categoria'], observed=True).agg(count=('desocupado', 'size'))
 
 # Calcular la proporción de desocupados en cada categoría de edad
-agg_desocup_2024['proporcion'] = agg_desocup_2024['count'] / agg_desocup_2024['count'].sum()
-
+agg_desocup_2024['proporcion 2024'] = agg_desocup_2024['count'] / agg_desocup_2024['count'].sum()
 print(agg_desocup_2024)
 
-# FALTA SACAR TABLITA O GRÁFICO 
+# Unimos los dataframes en uno
+agg_desocup_combined = pd.merge(agg_desocup_2004[['proporcion 2004']], 
+                                agg_desocup_2024[['proporcion 2024']], 
+                                left_index=True, right_index=True, how='outer')
+
+# Vemos el resultado
+print(agg_desocup_combined)
+
+# Exportamos a Latex
+agg_desocup_combined.to_latex("output/tabla_6b.tex", index=True)
+
 
 #_______________________________________________________________________________________#
 #
@@ -537,3 +628,190 @@ print(agg_desocup_2024)
 #_______________________________________________________________________________________#
 
 # Poner mini resumen de lo que vamos a hacer en esta parte
+
+#_________________________________________________________________________________________________#
+# 
+#                                                  Inciso 1
+# Objetivos: 
+#    - Establecer a "desocupado" como variable dependiente y al resto como independientes
+#    - Partir la base respondieron en una base de entrenamiento y una de test
+#_________________________________________________________________________________________________#
+
+# Importamos paquetes. Particularmente, importamos las funciones a utilizar del paquete sklearn
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, roc_curve, roc_auc_score, accuracy_score
+
+# Partimos la base de cada año en una muestra de entrenamiento y una de test 
+y_2004 = respondieron_2004['desocupado']
+y_2024 = respondieron_2024['desocupado']
+
+# Columnas: definimos un vector de variables explicativas que nos interesan
+columnas =  ['ch04', 'ch07', 'nivel_ed', 'estado', 'cat_inac']
+
+# 2004 
+# Definimos el vector de variables explicativas (con las variables categóricas en formato dummy)
+x_2004 = pd.get_dummies(respondieron_2004, columns = columnas, drop_first=True)
+
+# Filtramos para quedarnos solo con las columnas que contienen las dummies generadas
+x_2004 = x_2004.loc[:, x_2004.columns.str.startswith(tuple(columnas))]
+
+# Agregamos las variables numéricas 'ch06' e 'ipcf' sin transformarlas
+x_2004['ch06'] = respondieron_2004['ch06']
+x_2004['ipcf'] = respondieron_2004['ipcf']
+
+# 2024 
+# Definimos el vector de variables explicativas (con las variables categóricas en formato dummy)
+x_2024 = pd.get_dummies(respondieron_2024, columns = columnas, drop_first=True)
+
+# Filtramos para quedarnos solo con las columnas que contienen las dummies generadas
+x_2024 = x_2024.loc[:, x_2024.columns.str.startswith(tuple(columnas))]
+
+# Agregamos las variables numéricas 'ch06' e 'ipcf' sin transformarlas
+x_2024['ch06'] = respondieron_2024['ch06']
+x_2024['ipcf'] = respondieron_2024['ipcf']
+
+# Tenemos ya entonces el vector de variables explicativas y la variable a explicar para cada año. 
+
+# Agregamos columnas de 1s
+x_2004['constante'] = 1
+x_2024['constante'] = 1
+
+# El 30% de la base se vuelve base de testeo, por ende el 70% es de tratamiento 
+x_train_2004, x_test_2004, y_train_2004, y_test_2004 = train_test_split(x_2004, y_2004, test_size = 0.3, random_state = 101)
+x_train_2024, x_test_2024, y_train_2024, y_test_2024 = train_test_split(x_2024, y_2024, test_size = 0.3, random_state = 101)
+
+#________________________________________________________________________________________________________________________#
+# 
+#                                                  Inciso 2
+# Objetivos: 
+#    - Implementar los siguientes métodos: Regresión logística, Análisis discriminante lineal, KKN con k=3 y Naive Bayes
+#    - Reportar: matriz de confusión, curva ROC, valores de AUC y de Accuracy de cada uno
+#_________________________________________________________________________________________________________________________#
+
+# Definimos una función
+def evaluate_model(model, X_train, X_test, y_train, y_test): # los inputs de la función son los datos de testeo y de entrenamiento
+    model.fit(X_train, y_train) # ajustamos el modelo para la base de entrenamiento
+    
+    y_pred = model.predict(X_test) # predecimos y con los datos de la base de entrenamiento
+    y_prob = model.predict_proba(X_test)[:, 1] # predecimos la probabilidad de que y esté en una clase
+    
+    cm = confusion_matrix(y_test, y_pred) # matriz de confusión
+    
+    fpr, tpr, _ = roc_curve(y_test, y_prob) # curva ROC 
+    auc = roc_auc_score(y_test, y_prob) # AUC
+    
+    accuracy = accuracy_score(y_test, y_pred) # accuracy score
+    
+    return cm, fpr, tpr, auc, accuracy # que devuelva todos los valores
+
+# Definimos los modelos a utilizar
+models = {
+    'Regresión Logística': LogisticRegression(max_iter= 10000),
+    'Análisis Discriminante Lineal': LinearDiscriminantAnalysis(),
+    'KNN (k=3)': KNeighborsClassifier(n_neighbors=3),
+    'Naive Bayes': GaussianNB()
+}
+
+# 2004
+# Imprimimos todos los resultados pedidos en la consigna 
+results = {}
+print("Resultados para 2004:")
+for model_name, model in models.items():
+    cm, fpr, tpr, auc, accuracy = evaluate_model(model, x_train_2004, x_test_2004, y_train_2004, y_test_2004)
+    results[model_name] = {
+        'Matriz de Confusión': cm,
+        'AUC': auc,
+        'Accuracy': accuracy,
+        'FPR': fpr,
+        'TPR': tpr
+    }
+
+    print(f"{model_name}:")
+    print(f"Matriz de Confusión:\n{cm}")
+    print(f"AUC: {auc:.2f}")
+    print(f"Accuracy: {accuracy:.2f}\n") 
+    
+# Graficamos la Curva ROC 
+plt.figure(figsize=(10, 5))
+for model_name, metrics in results.items():
+    plt.plot(metrics['FPR'], metrics['TPR'], label=f'{model_name} (AUC = {metrics["AUC"]:.2f})')
+
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('Tasa de Falsos Positivos')
+plt.ylabel('Tasa de Verdaderos Positivos')
+plt.title('Curva ROC - 2004')
+plt.legend(loc='lower right')
+plt.show()
+
+# 2024
+# Imprimimos todos los resultados pedidos en la consigna 
+results = {}
+print("Resultados para 2024:")
+for model_name, model in models.items():
+    cm, fpr, tpr, auc, accuracy = evaluate_model(model, x_train_2024, x_test_2024, y_train_2024, y_test_2024)
+    results[model_name] = {
+        'Matriz de Confusión': cm,
+        'AUC': auc,
+        'Accuracy': accuracy,
+        'FPR': fpr,
+        'TPR': tpr
+    }
+
+    print(f"{model_name}:")
+    print(f"Matriz de Confusión:\n{cm}")
+    print(f"AUC: {auc:.2f}")
+    print(f"Accuracy: {accuracy:.2f}\n")
+    
+    
+# Graficamos la Curva ROC 
+plt.figure(figsize=(10, 5))
+for model_name, metrics in results.items():
+    plt.plot(metrics['FPR'], metrics['TPR'], label=f'{model_name} (AUC = {metrics["AUC"]:.2f})')
+
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('Tasa de Falsos Positivos')
+plt.ylabel('Tasa de Verdaderos Positivos')
+plt.title('Curva ROC - 2004')
+plt.legend(loc='lower right')
+plt.show()
+
+#________________________________________________________________________________________________________________#
+# 
+#                                                  Inciso 3
+# Objetivos: 
+#    - Comparar los resultados de 2004 y 2024 y responder cuál de los métodos predice mejor para cada año
+#________________________________________________________________________________________________________________#
+
+# Justificación en el documento. Mejores modelos para ambos años: Modelo logístico y Naive Bayes
+
+
+
+#________________________________________________________________________________________________________________#
+# 
+#                                                  Inciso 4
+# Objetivos: 
+#    - Con el método seleccionado en el inciso 3, predecir qué personas de la base norespondieron son desocupadas
+#    - Mostrar proporción de personas de la base norespondieron que están desocupadas
+#________________________________________________________________________________________________________________#
+
+
+
+
+
+
+
+
+
+
+
+
+
