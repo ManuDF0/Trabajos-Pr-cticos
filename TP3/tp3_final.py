@@ -578,9 +578,12 @@ tabla_combinada.to_latex("output/tabla_6a.tex", index=False)
 # 
 #                                                  Inciso 6.B
 # Objetivos: 
+#    - Calcular la cantidad de personas desocupadas para cada año     
 #    - Crear una variable categórica de años cumplidos agrupada de a 10 años
 #    - Mostrar la proporción de desocupados por edad agrupada comparando 2004 vs 2024 
 #______________________________________________________________________________________________________________________________#
+
+# La cantidad de desocupados por año ya está calculada en el inciso 2.E. 
 
 # Creamos bins de años en 10 en 10 
 bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] 
