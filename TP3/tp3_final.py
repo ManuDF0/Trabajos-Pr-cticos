@@ -583,13 +583,34 @@ tabla_combinada.to_latex("output/tabla_6a.tex", index=False)
 #    - Mostrar la proporción de desocupados por edad agrupada comparando 2004 vs 2024 
 #______________________________________________________________________________________________________________________________#
 
-# La cantidad de desocupados por año ya está calculada en el inciso 2.E. 
+# Cantidad de desocupados por año en la base respondieron: 
+# 2004     
+cantidad_desocupados2004 = respondieron_2004[respondieron_2004['desocupado'] == 1].shape[0]
+print(cantidad_desocupados2004)
+
+# 2024
+cantidad_desocupados2024 = respondieron_2024[respondieron_2024['desocupado'] == 1].shape[0]
+print(cantidad_desocupados2024)
+# Igualmente, esta información ya la teníamos del inciso 2.E 
+
+# Cantidad de desocupados por año en la base respondieron: 
+# 2004     
+cantidad_desocupados2004 = respondieron_2004[respondieron_2004['desocupado'] == 1].shape[0]
+print(cantidad_desocupados2004)
+
+# 2024
+cantidad_desocupados2024 = respondieron_2024[respondieron_2024['desocupado'] == 1].shape[0]
+print(cantidad_desocupados2024)
+
+# Igualmente, esta información ya la teníamos del inciso 2.E 
 
 # Creamos bins de años en 10 en 10 
 bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] 
 
 # Le ponemos labels a los bins 
 labels = ['0-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99']
+
+conteo_edad_categoria = respondieron_2024['edad_categoria'].value_counts()
 
 # 2004: 
 # Creamos una variable que se llama edad_categoría
