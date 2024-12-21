@@ -194,11 +194,10 @@ data_x = df_clean['ipcf']
 # 1. Gráfico de caja expandido
 fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(x=data_x, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'color': 'red', 'alpha': 0.5})
-ax.set_title('Boxplot para detectar outliers')
-ax.set_xlabel('Ingreso Per Cápita Familiar')
+ax.set_title('')
+ax.set_xlabel('Ingreso Per Cápita Familiar (en millones de pesos)', fontsize=14)
 plt.show()
 fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_ipcf.png")
-
 
 # 2. Gráfico de dispersión log-transformado
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -239,8 +238,8 @@ data_x2 = df_clean['t_vi']
 # Gráfico de caja expandido
 fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(x=data_x2, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'color': 'red', 'alpha': 0.5})
-ax.set_title('Boxplot para detectar outliers')
-ax.set_xlabel('Ingreso No Laboral Per Cápita')
+ax.set_title('')
+ax.set_xlabel('Ingreso No Laboral Per Cápita (en millones de pesos)', fontsize=14)
 plt.show()
 fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_tvi.png")
 
@@ -250,8 +249,8 @@ data_x3 = df_clean['edad']
 # Gráfico de caja expandido
 fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(x=data_x3, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'color': 'red', 'alpha': 0.5})
-ax.set_title('Boxplot para detectar outliers')
-ax.set_xlabel('Edad')
+ax.set_title('')
+ax.set_xlabel('Edad', fontsize=14)
 plt.show()
 fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_edad.png")
 
