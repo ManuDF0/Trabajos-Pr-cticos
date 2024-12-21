@@ -182,16 +182,10 @@ obs # seguimos con 2068, no hay valores negativos
 
 # %% 1.3.Outliers
 
-plt.boxplot(df_clean['ipcf'], vert=False)
-plt.title("Detección de Outliers en ipcf")
-plt.xlabel("ipcf")
-plt.show()
-
-# Asegurarse de que 'ipcf' esté en formato correcto
+# 1. Ingreso per cápita familiar 
+# Nos aseguramos de que 'ipcf' esté en formato correcto
 data_x = df_clean['ipcf']
-
-# Ingreso per cápita familiar 
-# 1. Gráfico de caja expandido
+# Gráfico de caja expandido
 fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(x=data_x, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'color': 'red', 'alpha': 0.5})
 ax.set_title('')
@@ -199,41 +193,8 @@ ax.set_xlabel('Ingreso Per Cápita Familiar (en millones de pesos)', fontsize=14
 plt.show()
 fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_ipcf.png")
 
-# 2. Gráfico de dispersión log-transformado
-fig, ax = plt.subplots(figsize=(8, 4))
-log_data_x = np.log1p(data_x)  # Log-transformar los datos
-ax.scatter(range(len(log_data_x)), log_data_x, 
-           alpha=0.6, color='tomato', s=5)
-ax.set_title('Gráfico de dispersión con escala logarítmica')
-ax.set_xlabel('Índice de Observación')
-ax.set_ylabel('Log(1+IPCF)')
-plt.show()
-
-# 3. Histograma truncado
-fig, ax = plt.subplots(figsize=(8, 4))
-ax.hist(data_x, bins=30, color='thistle', alpha=0.7, range=(0, np.percentile(data_x, 95)))  # Truncado al percentil 95
-ax.set_title('Histograma truncado para IPCF')
-ax.set_xlabel('Valores de IPCF (truncados)')
-ax.set_ylabel('Frecuencia')
-plt.show()
-
-# 4. Gráfico ECDF
-fig, ax = plt.subplots(figsize=(8, 4))
-sns.ecdfplot(data_x, ax=ax, color='orchid')
-ax.set_title('Gráfico ECDF para IPCF')
-ax.set_xlabel('Valores de IPCF')
-ax.set_ylabel('Probabilidad acumulada')
-plt.show()
-
-# 5. Violin plot con escala logarítmica
-fig, ax = plt.subplots(figsize=(8, 4))
-sns.violinplot(x=np.log1p(data_x), ax=ax, color='yellowgreen', alpha=0.7)
-ax.set_title('Violin Plot con escala logarítmica para IPCF')
-ax.set_xlabel('Log(1+IPCF)')
-plt.show()
-
-# Ingreso no laboral per cápita 
-# Asegurarse de que 't_vi' esté en formato correcto
+# 2. Ingreso no laboral per cápita 
+# Nos aseguramos de que 't_vi' esté en formato correcto
 data_x2 = df_clean['t_vi']
 # Gráfico de caja expandido
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -243,8 +204,8 @@ ax.set_xlabel('Ingreso No Laboral Per Cápita (en millones de pesos)', fontsize=
 plt.show()
 fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_tvi.png")
 
-# Edad
-# Asegurarse de que 't_vi' esté en formato correcto
+# 3. Edad
+# Nos aseguramos de que 't_vi' esté en formato correcto
 data_x3 = df_clean['edad']
 # Gráfico de caja expandido
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -253,6 +214,15 @@ ax.set_title('')
 ax.set_xlabel('Edad', fontsize=14)
 plt.show()
 fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_edad.png")
+
+# %% 1.3 Generamos dummys para variables categóricas 
+
+
+
+
+
+
+
 
 
 
