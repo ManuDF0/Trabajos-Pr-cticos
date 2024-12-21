@@ -15,7 +15,6 @@ import os
 import seaborn as sns
 import statsmodels.api as sm     
 
-
 from stargazer.stargazer import Stargazer
 from sklearn.preprocessing import scale
 from sklearn.linear_model import Lasso, LassoCV, Ridge, RidgeCV
@@ -29,15 +28,15 @@ from sklearn.model_selection import cross_val_score
 pd.options.display.float_format = '{:.2f}'.format
 
 # configurando directorio de trabajo
-# os.chdir("/Users/diegofmeijide/Documents/MAE/Big data/tp4")
-os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
+os.chdir("/Users/diegofmeijide/Documents/MAE/Big data/tp4")
+
 
 # %% importando datos
 
-h_2024 = pd.read_excel("input/usu_hogar_T124.xlsx")
-i_2024 = pd.read_excel("input/usu_individual_T124.xlsx")
-h_2004 = pd.read_stata("input/Hogar_t104.dta", convert_categoricals=False)
-i_2004 = pd.read_stata("input/Individual_t104.dta", convert_categoricals=False)
+h_2024 = pd.read_excel("datos/usu_hogar_T124.xlsx")
+i_2024 = pd.read_excel("datos/usu_individual_T124.xlsx")
+h_2004 = pd.read_stata("datos/Hogar_t104.dta", convert_categoricals=False)
+i_2004 = pd.read_stata("datos/Individual_t104.dta", convert_categoricals=False)
 
 
 # %% filtramos Bahía Blanca en 2024
@@ -125,6 +124,7 @@ df = pd.concat([df_2004, df_2024], axis=0, ignore_index=True)
 
 print(df.shape)
 
+
 # %% Filtrando variables relevantes y modificando nombres de variables
 
 df_clean = df[["año","codusu","nro_hogar","componente","pondera","ch04", "ch06", "ch07", 
@@ -135,6 +135,8 @@ df_clean = df[["año","codusu","nro_hogar","componente","pondera","ch04", "ch06"
                "v17","v18","v19_a","v19_b", 
                "iv2", "t_vi"]]
 
+df_clean = df_clean[df_clean["t_vi"]!=-9]
+
 df_clean = df_clean.rename(columns={'ch03': 'parentesco'})
 df_clean = df_clean.rename(columns={'ch04': 'genero'})
 df_clean = df_clean.rename(columns={'ch06': 'edad'})
@@ -143,42 +145,9 @@ df_clean = df_clean.rename(columns={'ch08': 'cobertura_medica'})
 
 # %% 1.3.missing values
 
-print(df_clean.isnull().sum()) # no se presentan missing values
+print(df_clean.isnull().sum())
 
-# Missing values para ingreso no laboral individual (se identifica con -9)
-count_9= df['t_vi'].value_counts().get(-9, 0)
-print(f"Cantidad de -9: {count_9}") # vemos que hay 74 missing values en ingreso no laboral per capita
-df_clean = df_clean[df_clean["t_vi"]!=-9] # eliminamos los missing values del ingreso no laboral 
-
-# Chequeamos que se hayan eliminado los missing values 
-count_9_nuevo= df_clean['t_vi'].value_counts().get(-9, 0)
-print(f"Cantidad de -9: {count_9_nuevo}")  
-df_clean = df_clean[df_clean["t_vi"]!=-9] 
-
-# %% 1.3. Valores negativos 
-
-# Edad 
-print(df_clean['edad'].dtype) # variable del tipo float
-obs = df_clean.shape[0] # cantidad de observaciones 2090
-obs
-# Nos quedamos con los valores que son mayores o iguales a cero 
-df_clean = df_clean.loc[(df_clean['edad'] >= 0)] 
-obs = df_clean.shape[0] # pasamos a 2068 observaciones. Hay 22 edades negativas
-obs
-
-# Ingreso per cápita (ipcf)
-print(df_clean['ipcf'].dtype) # variable del tipo numérica
-# Nos quedamos con los valores que son mayores o iguales a cero 
-df_clean = df_clean.loc[(df_clean['ipcf'] >= 0)] 
-obs = df_clean.shape[0] 
-obs # seguimos con 2068, no hay valores negativos 
-
-# Ingreso no laboral per cápita (t_vi)
-print(df_clean['t_vi'].dtype) # variable del tipo numérica
-# Nos quedamos con los valores que son mayores o iguales a cero 
-df_clean = df_clean.loc[(df_clean['t_vi'] >= 0)] 
-obs = df_clean.shape[0] 
-obs # seguimos con 2068, no hay valores negativos 
+# no se presentan missing values
 
 # %% 1.3.Outliers
 
@@ -254,10 +223,11 @@ df_clean['miembros_hogar'] = df_clean.groupby(['codusu', 'nro_hogar'])['componen
 df_clean['hacinamiento'] = (df_clean['miembros_hogar'] / df_clean['iv2'] > 3).astype(int)
 
 
-# 3. ingreso no laboral per cápita, la no respuesta de t_vi se identifica con -9 y hay 74
+# 3. inegreso no laboral per cápita, la no respuesta de t_vi se identifica con -9 y hay 74
 
 # Calcular el ingreso no laboral del hogar per cápita
 df_clean['ingreso_no_laboral_pc'] = df_clean['t_vi'] / df_clean['miembros_hogar']
+
 
 
 # %% 1.5. Estadísticas descriptivas
@@ -323,6 +293,30 @@ dummies_24 = pd.get_dummies(df_24[[
                                    'estado_civil',
                                    'cobertura_medica',
                                    'nivel_ed']], drop_first=True)
+
+# Definimos las variables que incluiremos en el set de X
+# Eliminamos salarios (porque es nuestra y) y las columnas de strings
+X_04_ = df_04.drop(['estado_civil', 'cobertura_medica', 'nivel_ed', 
+                   'iv2', 't_vi', 'año', 'codusu', 'nro_hogar', 'componente',
+                   'pondera'], axis=1).astype('float64')
+
+X = pd.concat([X_04_, dummies[['League_N', 'Division_W', 'NewLeague_N']]], axis=1)
+
+# seleccionando X e y 2004
+y_04 = df_04.desocupado
+X_04 = df_04.
+
+# seleccionando X e y 2024
+y_24 = df_24.desocupado
+X_24 = df_24.
+
+# Train test split 2004
+X_train_04, X_test_04, y_train_04, y_test_04 = train_test_split(X, y, test_size=0.3, random_state=101)
+
+# Train test split 2024
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=101)
+
+
 
 
 
