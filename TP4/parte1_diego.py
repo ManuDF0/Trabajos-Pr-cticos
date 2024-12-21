@@ -39,7 +39,6 @@ i_2024 = pd.read_excel("input/usu_individual_T124.xlsx")
 h_2004 = pd.read_stata("input/Hogar_t104.dta", convert_categoricals=False)
 i_2004 = pd.read_stata("input/Individual_t104.dta", convert_categoricals=False)
 
-
 # %% filtramos Bahía Blanca en 2024
 
 h_2024.info(verbose = True)# verbose imprime resumen completo
@@ -130,10 +129,10 @@ print(df.shape)
 df_clean = df[["año","codusu","nro_hogar","componente","pondera","ch04", "ch06", "ch07", 
                "ch08","ch03",
                "nivel_ed", "estado", "cat_inac", "ipcf",
-               "v1","v2","v3","v4","v5","v6","v7","v8","v9",
+               "v2", "v5","v6","v7","v8","v9",
                "v10","v11","v12","v13","v14","v15","v16",
                "v17","v18","v19_a","v19_b", 
-               "iv2", "t_vi"]]
+               "iv2", "t_vi", "iv3", "iv4", "iv5", "iv6", "iv7", "iv8", "iv9", "iv10", "iv11", "ii3", "iv12_3" ]]
 
 df_clean = df_clean.rename(columns={'ch03': 'parentesco'})
 df_clean = df_clean.rename(columns={'ch04': 'genero'})
@@ -217,14 +216,25 @@ fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/
 
 # %% 1.3 Generamos dummys para variables categóricas 
 
+# Pasamos a formato categórica las variables de fuentes alternativas de ingreso
+print(df_clean['v2'].dtype) 
+# Identificar las columnas que comienzan con 'v'
+columns_starting_with_v = [col for col in df_clean.columns if col.startswith('v')]
+# Convertir esas columnas a categóricas
+for col in columns_starting_with_v:
+    df_clean[col] = pd.Categorical(df_clean[col])
+df_clean.info(verbose = True)# verbose imprime resumen completo
 
+# Generamos dummys para variables con más de una categoría 
+# Primero pasamos a formato categórico a las variables
+categoricas = ["cobertura_medica", "nivel_ed", "estado_civil", "iv3", "iv4", "iv5", "iv6", "iv7", "iv8", "iv9", "iv10", "iv11", "ii3", "iv12_3"]
+for var in categoricas:
+    df_clean[var] = pd.Categorical(df_clean[var])
 
-
-
-
-
-
-
+# Generamos las variables dummy
+dummies = pd.get_dummies(df_clean[categoricas], 
+                          drop_first=True,
+                          dtype=int)
 
 # %% 1.4. Contrucción de variables relevantes que predigan desocupación
 
