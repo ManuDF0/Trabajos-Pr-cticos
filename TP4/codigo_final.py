@@ -566,7 +566,7 @@ def Lasso_logit(x_train, y_train, x_test, y_test, alpha):
 # %% 2.6-2.7 Resultados LASSO 2004
 
 # Para 2004
-coefs, mse = Lasso_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 10) 
+coefs, mse = Lasso_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 1) 
 lasso_coefs = pd.DataFrame(coefs, index= [0]).melt() # Guardamos los coeficientes en un df para 2004
 
 print(f'El ECM para LASSO en 2004 es: {mse}') # Imprimimos el mse para 2004
@@ -574,14 +574,14 @@ print(f'El ECM para LASSO en 2004 es: {mse}') # Imprimimos el mse para 2004
 # %%  2.6-2.7 Resultados LASSO 2024
 
 # Para 2024
-coefs, mse = Lasso_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 10) # Hacemos lo mismo con los coefs de 2024
+coefs, mse = Lasso_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 100) # Hacemos lo mismo con los coefs de 2024
 lasso_coefs = pd.concat([lasso_coefs, pd.DataFrame(coefs, index= [0]).melt()['value']], axis= 1) # Juntamos los coeficientes de ambos años
 lasso_coefs.columns = ['variable', '2004', '2024'] # Renombramos las columnas
 
 print(f'El ECM para LASSO en 2024 es: {mse}')
 
 # %% 2.7 Función de resultados Ridge
-
+  
 # Queremos evaluar la capacidad predictiva de Ridge vs logit mediante el mse
 def Ridge_logit(x_train, y_train, x_test, y_test, alpha):
     model = LogisticRegression(penalty='l2', C=1/alpha, max_iter=10000).fit(x_train, y_train)
@@ -590,13 +590,13 @@ def Ridge_logit(x_train, y_train, x_test, y_test, alpha):
 
 # %% 2.7 Resultados Ridge 2004
 
-mse = Ridge_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 100) # Calculamos el mse para Ridge en 2004
+mse = Ridge_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 0.1) # Calculamos el mse para Ridge en 2004
 print(f'El ECM para Ridge en 2004 es: {mse}')
 
 
 # %% 2.7 Resultados Ridge 2024
 
-mse = Ridge_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 10) # Calculamos el mse para Ridge en 2024
+mse = Ridge_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 100) # Calculamos el mse para Ridge en 2024
 print(f'El ECM para Ridge en 2004 es: {mse}')
 
 
