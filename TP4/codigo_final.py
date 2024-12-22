@@ -22,12 +22,15 @@ import statsmodels.api as sm
 
 from stargazer.stargazer import Stargazer
 from sklearn.preprocessing import scale
-from sklearn.linear_model import Lasso, LassoCV, Ridge, RidgeCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Lasso, LassoCV, Ridge, RidgeCV, LogisticRegression
+from sklearn.metrics import confusion_matrix, roc_auc_score, accuracy_score, roc_curve
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
+from typing import Literal
 
 # Evitamos la notación científica en numpy
 pd.options.display.float_format = '{:.2f}'.format
@@ -312,21 +315,6 @@ print(f"Tasa de desocupación: {tasa_desocupacion:.2f}%")
 #______________________________________________________________________________________________________________________________#
 
 # %% 2.1. Base de prueba y base de entrenamiento 
-
-# Creamos bases respondieron y no respondieron
-respondieron = df_clean.loc[df_clean['estado'] != 0] # creamos base con personas que respondieron su condición de actividad
-norespondieron = df_clean.loc[df_clean['estado'] == 0] # creamos base con personas que no respondieron su condición de actividad
-
-# Creamos columna desocupada
-desocupada = pd.DataFrame(
-    np.where(respondieron['estado'].isin([2]), 1, 0),  # Creamos la columna "desocupada"
-    columns=['desocupada'],
-    index=respondieron.index  # Le ponemos el index del df respondieron para que haga bien el concat
-)
-respondieron = pd.concat([respondieron, desocupada], axis=1) # Le agregamos la columna al df
-
-# Definimos las columnas de interés
-columnas = ["año","ch04", "ch06", "ch07","ch08","ch03", "nivel_ed", "estado", "cat_inac", 
            
 # Generamos bases respondieron y no respondieron
 respondieron = df_clean.loc[df_clean['estado'] != 0] # creamos base con personas que respondieron su condición de actividad
