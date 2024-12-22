@@ -36,8 +36,8 @@ from typing import Literal
 pd.options.display.float_format = '{:.2f}'.format
 
 # configurando directorio de trabajo
-os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
-#os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
+#os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
+os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
 
 # %% importamos datos
 
@@ -294,6 +294,17 @@ data_2024_counts3 = df_clean[df_clean['año'] == "2024"]['ii3'].value_counts(nor
 # 4) Villa de emergencia 
 data_2004_counts4 = df_clean[df_clean['año'] == "2004"]['iv12_3'].value_counts(normalize=True) * 100 
 data_2024_counts4 = df_clean[df_clean['año'] == "2024"]['iv12_3'].value_counts(normalize=True) * 100
+
+
+
+
+
+
+
+
+
+
+
 
 # Armamos una función para hacer gráficos de barras que comparen entre años para cuando hay 2 categorías 
 def composicion_bar(val_2004, val_2024, x_label, output_path=None):
