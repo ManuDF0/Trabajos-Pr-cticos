@@ -109,11 +109,11 @@ for col in h_2004.columns:
     if col in i_2004.columns and col != "CODUSU" and col != "nro_hogar":  # Evitar eliminar las claves de unión
         df_2004.drop(columns=[f"{col}_right"], inplace=True)
 
-# %% paso todas las columnas a minúscula en 2024 para que quede como en 2004
+# %% Pasamos todas las columnas a minúscula en 2024 para que quede como en 2004
 
 df_2024.columns = df_2024.columns.str.lower()
 
-# %% modificando codusu
+# %% Modificando codusu
 
 # Cambiar el nombre de la columna "CODUSU" a "codusu"
 df_2004 = df_2004.rename(columns={"CODUSU": "codusu"})
@@ -124,7 +124,7 @@ df_2004 = df_2004.rename(columns={"CODUSU": "codusu"})
 df_2004["año"] = pd.Categorical(["2004"] * len(df_2004))
 df_2024["año"] = pd.Categorical(["2024"] * len(df_2024))
 
-# %% concatenando ambas bases
+# %% Concatenando ambas bases
 
 # Concatenar 2004 y 2024 verticalmente
 df = pd.concat([df_2004, df_2024], axis=0, ignore_index=True)
@@ -147,7 +147,7 @@ df_clean = df_clean.rename(columns={'ch06': 'edad'})
 df_clean = df_clean.rename(columns={'ch07': 'estado_civil'})
 df_clean = df_clean.rename(columns={'ch08': 'cobertura_medica'})
 
-# %% 1.3.missing values
+# %% 1.3.Missing values
 
 print(df_clean.isnull().sum()) # no se presentan missing values
 
@@ -223,7 +223,7 @@ fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/
 
 # %% 1.3 Generamos dummys para variables categóricas 
 
-# Pasamos a formato categórica las variables de fuentes alternativas de ingreso
+# Pasamos a formato categórico las variables de fuentes alternativas de ingreso
 print(df_clean['v2'].dtype) 
 # Identificar las columnas que comienzan con 'v'
 columns_starting_with_v = [col for col in df_clean.columns if col.startswith('v')]
@@ -231,6 +231,13 @@ columns_starting_with_v = [col for col in df_clean.columns if col.startswith('v'
 for col in columns_starting_with_v:
     df_clean[col] = pd.Categorical(df_clean[col])
 df_clean.info(verbose = True)# verbose imprime resumen completo
+
+# Pasamos a formato categórico las otras variables 
+other_columns = ["cobertura_medica", "nivel_ed", "estado_civil", "iv3", "iv4", "iv5", "iv6", "iv7", "iv8", "iv9", "iv10", "iv11", "ii3", "iv12_3"]
+for col in other_columns:
+    df_clean[col] = pd.Categorical(df_clean[col])
+df_clean.info(verbose = True)# verbose imprime resumen completo
+
 
 # Generamos dummys para variables con más de una categoría 
 # Primero pasamos a formato categórico a las variables
