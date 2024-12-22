@@ -498,23 +498,69 @@ def plot_roc(fpr, tpr, auc, year, penalty):
     plt.savefig(f'./output/roc_{year}_{penalty}.png')
     plt.show()
     
-# %% 2.4 Estimando los modelos
+# %% 2.4 Estimando los modelos y obteniendo las métrocas de rendimiento.
+
+    
+# 1) Generar la lista de resultados
+results = []
 
 # Para 2004
 for p in ['l1', 'l2']:
-    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(x_train_2004, x_test_2004, y_train_2004, y_test_2004, p)
-    print(cm)
-    print(auc)
-    print(accuracy)
-    plot_roc(fpr, tpr, auc, 2004, p)
+    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(
+        x_train_2004, x_test_2004, y_train_2004, y_test_2004, p
+    )
+    # cm suele ser de la forma [[TN, FP], [FN, TP]]
+    results.append({
+        'year': 2004,
+        'penalty': p,
+        'cm': cm,
+        'auc': auc,
+        'acc': accuracy
+    })
 
 # Para 2024
 for p in ['l1', 'l2']:
-    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(x_train_2024, x_test_2024, y_train_2024, y_test_2024, p)
-    print(cm)
-    print(auc)
-    print(accuracy)
-    plot_roc(fpr, tpr, auc, 2024, p)
+    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(
+        x_train_2024, x_test_2024, y_train_2024, y_test_2024, p
+    )
+    results.append({
+        'year': 2024,
+        'penalty': p,
+        'cm': cm,
+        'auc': auc,
+        'acc': accuracy
+    })
+
+# 2) Imprimir el código LaTeX de la tabla en pantalla (stdout).
+#    Si deseas guardarlo en un archivo, cambia los 'print' por escrituras en un archivo .tex.
+print(r"\begin{table}[H]")
+print(r"\centering")
+print(r"\begin{tabular}{cccccccc}")
+print(r"\hline")
+print(r"Año & Penalidad & TN & FP & FN & TP & AUC & Accuracy \\")
+print(r"\hline")
+
+for item in results:
+    year = item['year']
+    penalty = item['penalty']
+    cm = item['cm']   # [[TN, FP], [FN, TP]]
+    auc_val = item['auc']
+    acc_val = item['acc']
+    
+    tn, fp = cm[0]
+    fn, tp = cm[1]
+    
+    # Ajusta el número de decimales de AUC y Accuracy si lo deseas
+    print(r"{} & {} & {} & {} & {} & {} & {:.3f} & {:.3f} \\".format(
+        year, penalty, tn, fp, fn, tp, auc_val, acc_val
+    ))
+
+print(r"\hline")
+print(r"\end{tabular}")
+print(r"\caption{Resultados de la evaluación: matriz de confusión, AUC y Accuracy.}")
+print(r"\label{tab:resultados}")
+print(r"\end{table}")
+
     
 # %% 2.5 Grilla de lambdas 
 
