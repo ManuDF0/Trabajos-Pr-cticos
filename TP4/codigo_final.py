@@ -36,8 +36,8 @@ from typing import Literal
 pd.options.display.float_format = '{:.2f}'.format
 
 # configurando directorio de trabajo
-# os.chdir("/Users/diegofmeijide/Documents/MAE/Big data/tp4")
-os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
+os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
+#os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
 
 # %% importamos datos
 
@@ -197,7 +197,7 @@ sns.boxplot(x=data_x, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'co
 ax.set_title('')
 ax.set_xlabel('Ingreso Per Cápita Familiar (en millones de pesos)', fontsize=14)
 plt.show()
-fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_ipcf.png")
+#fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_ipcf.png")
 
 # 2. Ingreso no laboral per cápita 
 # Nos aseguramos de que 't_vi' esté en formato correcto
@@ -208,7 +208,7 @@ sns.boxplot(x=data_x2, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'c
 ax.set_title('')
 ax.set_xlabel('Ingreso No Laboral Per Cápita (en millones de pesos)', fontsize=14)
 plt.show()
-fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_tvi.png")
+#fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_tvi.png")
 
 # 3. Edad
 # Nos aseguramos de que 't_vi' esté en formato correcto
@@ -219,7 +219,7 @@ sns.boxplot(x=data_x3, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'c
 ax.set_title('')
 ax.set_xlabel('Edad', fontsize=14)
 plt.show()
-fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_edad.png")
+#fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_edad.png")
 
 # %% 1.3 Generamos dummys para variables categóricas 
 
@@ -342,12 +342,13 @@ columnas = ["año","codusu","nro_hogar","componente","pondera","genero", "edad",
             "iv11", "ii3", "iv12_3", "hacinamiento", "ingreso_no_laboral_pc", "cantidad_inactivos"]
 
 # Definimos para cada año variable explicada
-y_2004 = respondieron.loc[respondieron['año']==2004]['desocupada'] 
-y_2024 = respondieron.loc[respondieron['año']==2024]['desocupada']
+y_2004 = respondieron[respondieron["año"]=="2004"].desocupada
+y_2024 = respondieron[respondieron["año"]=="2024"].desocupada
 
 # Definimos para cada año vector de variables explicativas (en formato dummy) 
-x_2004 = pd.get_dummies(respondieron.loc[respondieron['año']==2004][columnas])
-x_2024 = pd.get_dummies(respondieron.loc[respondieron['año']==2024][columnas])
+x_2004 = pd.get_dummies(respondieron[respondieron['año']=="2004"][columnas])
+x_2024 = pd.get_dummies(respondieron[respondieron['año']=="2024"][columnas])
+
 
 # Agregamos constantes
 x_2004['constante'] = 1
@@ -403,7 +404,7 @@ def plot_roc(fpr, tpr, auc, year, penalty):
     plt.savefig(f'./output/roc_{year}_{penalty}.png')
     plt.show()
     
-# %% 
+# %% 2.4 Estimando los modelos
 
 # Para 2004
 for p in ['l1', 'l2']:
@@ -421,12 +422,12 @@ for p in ['l1', 'l2']:
     print(accuracy)
     plot_roc(fpr, tpr, auc, 2024, p)
     
-# %% 
+# %% 2.5 Grilla de lambdas 
 
 alphas = [10**i for i in range(-5, 5, 1)] # Armamos la grilla de valores posibles para lambda
 
 
-# %%
+# %% 2.5 Función para el boxplot
 
 # Función para el boxplot
 def box(data, year, model):
@@ -438,7 +439,7 @@ def box(data, year, model):
     plt.savefig(f'./output/boxplot_{year}_{model}.png')
     plt.show()
 
-# %%
+# %% 2.5 Función para el lineplot
 
 # Función para el lineplot
 def line_prop(prop, year):
@@ -453,7 +454,7 @@ def line_prop(prop, year):
     plt.tight_layout()
     plt.show()
 
-# %%
+# %% 2.5 Función para hacer kfold con Ridge
 
 # Función para hacer kfold con Ridge
 def ridge_cv(hyperparams, X_train, y_train):
@@ -485,19 +486,19 @@ def ridge_cv(hyperparams, X_train, y_train):
 	return best_hyperparam, mse_values
 
 
-# %%
+# %% 2.6 Estimando Ridge 2004
 alpha, mses = ridge_cv(alphas, x_train_2004, y_train_2004)
 print(f'El mejor alpha para Ridge en 2004 es: {alpha}')
 box(pd.DataFrame(mses).melt(), 2004, 'Ridge')
 
 
-# %%
+# %% 2.6 Estimando Ridge 2024
 
 alpha, mses = ridge_cv(alphas, x_train_2024, y_train_2024)
 print(f'El mejor alpha para Ridge en 2024 es: {alpha}')
 box(pd.DataFrame(mses).melt(), 2024, 'Ridge')
 
-# %%
+# %% 2.6 Función para hacer kfold con LASSO
 
 # Función para calcular el mejor alpha y las métricas de evaluación
 def lasso_logistic_cv(hyperparams, X_train, y_train):
@@ -535,7 +536,7 @@ def lasso_logistic_cv(hyperparams, X_train, y_train):
 	return best_hyperparam, mse_values, zero_coef_proportions
 
 
-# %%
+# %% 2.6 Estimando LASSO para 2004
 
 alpha, mses, prop = lasso_logistic_cv(alphas, x_train_2004, y_train_2004)
 print(f'El mejor alpha para LASSO en 2004 es: {alpha}')
@@ -544,7 +545,7 @@ promedios = pd.DataFrame({key: sum(value) / len(value) for key, value in prop.it
 line_prop(promedios, 2004)
 
 
-# %%
+# %% 2.6 Estimando LASSO para 2024
 
 alpha, mses, prop = lasso_logistic_cv(alphas, x_train_2024, y_train_2024)
 print(f'El mejor alpha para LASSO en 2024 es: {alpha}')
@@ -552,7 +553,7 @@ box(pd.DataFrame(mses).melt(), 2024, 'LASSO')
 promedios = pd.DataFrame({key: sum(value) / len(value) for key, value in prop.items()}, index= [0]).melt()
 line_prop(promedios, 2024)
 
-# %%
+# %% 2.6-2.7 Función de resultados LASSO 
 
 # Ahora queremos ver cuales son las variables nulas para cada modelo LASSO con el alpha optimo
 def Lasso_logit(x_train, y_train, x_test, y_test, alpha):
@@ -562,7 +563,7 @@ def Lasso_logit(x_train, y_train, x_test, y_test, alpha):
     mse = mean_squared_error(y_test, model.predict(x_test)) # También guardamos el mse para evaluar el modelo
     return dict(zip(var_names, coefs)), mse
 
-# %%
+# %% 2.6-2.7 Resultados LASSO 2004
 
 # Para 2004
 coefs, mse = Lasso_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 10) 
@@ -570,7 +571,7 @@ lasso_coefs = pd.DataFrame(coefs, index= [0]).melt() # Guardamos los coeficiente
 
 print(f'El ECM para LASSO en 2004 es: {mse}') # Imprimimos el mse para 2004
 
-# %%
+# %%  2.6-2.7 Resultados LASSO 2024
 
 # Para 2024
 coefs, mse = Lasso_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 10) # Hacemos lo mismo con los coefs de 2024
@@ -579,7 +580,7 @@ lasso_coefs.columns = ['variable', '2004', '2024'] # Renombramos las columnas
 
 print(f'El ECM para LASSO en 2024 es: {mse}')
 
-# %%
+# %% 2.7 Función de resultados Ridge
 
 # Queremos evaluar la capacidad predictiva de Ridge vs logit mediante el mse
 def Ridge_logit(x_train, y_train, x_test, y_test, alpha):
@@ -587,13 +588,13 @@ def Ridge_logit(x_train, y_train, x_test, y_test, alpha):
     mse = mean_squared_error(y_test, model.predict(x_test)) # Guardamos el mse para evaluar el modelo
     return mse
 
-# %%
+# %% 2.7 Resultados Ridge 2004
 
 mse = Ridge_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 100) # Calculamos el mse para Ridge en 2004
 print(f'El ECM para Ridge en 2004 es: {mse}')
 
 
-# %%
+# %% 2.7 Resultados Ridge 2024
 
 mse = Ridge_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 10) # Calculamos el mse para Ridge en 2024
 print(f'El ECM para Ridge en 2004 es: {mse}')
