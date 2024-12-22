@@ -287,27 +287,24 @@ data_2024_counts1 = df_clean[df_clean['año'] == "2024"]['v5'].value_counts(norm
 # 2) Ahorros 
 data_2004_counts2 = df_clean[df_clean['año'] == "2004"]['v15'].value_counts(normalize=True) * 100 
 data_2024_counts2 = df_clean[df_clean['año'] == "2024"]['v15'].value_counts(normalize=True) * 100
-# 3) Pisos 
-data_2004_counts3 = df_clean[df_clean['año'] == "2004"]['iv3'].value_counts(normalize=True) * 100 
-data_2024_counts3 = df_clean[df_clean['año'] == "2024"]['iv3'].value_counts(normalize=True) * 100
-# 4) Lugar de trabajo 
+# 3) Lugar de trabajo 
 df_clean = df_clean[df_clean['ii3'] != 0]
-data_2004_counts4 = df_clean[df_clean['año'] == "2004"]['ii3'].value_counts(normalize=True) * 100 
-data_2024_counts4 = df_clean[df_clean['año'] == "2024"]['ii3'].value_counts(normalize=True) * 100
-# 5) Villa de emergencia 
-data_2004_counts5 = df_clean[df_clean['año'] == "2004"]['iv12_3'].value_counts(normalize=True) * 100 
-data_2024_counts5 = df_clean[df_clean['año'] == "2024"]['iv12_3'].value_counts(normalize=True) * 100
+data_2004_counts3 = df_clean[df_clean['año'] == "2004"]['ii3'].value_counts(normalize=True) * 100 
+data_2024_counts3 = df_clean[df_clean['año'] == "2024"]['ii3'].value_counts(normalize=True) * 100
+# 4) Villa de emergencia 
+data_2004_counts4 = df_clean[df_clean['año'] == "2004"]['iv12_3'].value_counts(normalize=True) * 100 
+data_2024_counts4 = df_clean[df_clean['año'] == "2024"]['iv12_3'].value_counts(normalize=True) * 100
 
-# Armamos una función para hacer gráficos de barras que comparen entre años
+# Armamos una función para hacer gráficos de barras que comparen entre años para cuando hay 2 categorías 
 def composicion_bar(val_2004, val_2024, x_label, output_path=None):
     fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # creamos una figura con 2 subplots 
 
     # Gráfico de barras para 2004
     bars_2004 = axs[0].bar(val_2004.index, val_2004.values, color='skyblue')
-    axs[0].set_title('Composición en 2004', fontsize=13)  # título del gráfico con tamaño más grande
+    axs[0].set_title('Composición en 2004', fontsize=13)  # título del gráfico 
     axs[0].set_xlabel(x_label, fontsize=12)  # título eje x con tamaño más grande
-    axs[0].set_ylabel('Porcentaje', fontsize=12)  # título eje y con tamaño más grande
-    axs[0].set_ylim(0, 100)  # establecer los límites del eje y entre 0 y 100
+    axs[0].set_ylabel('Porcentaje', fontsize=12)  # título eje y c
+    axs[0].set_ylim(0, 100)  # establecemos los límites del eje y entre 0 y 100
     axs[0].set_xticks([])  # quitar números del eje x
 
     for bar, value, label in zip(bars_2004, val_2004.values, ["No", "Sí"]):
@@ -321,10 +318,10 @@ def composicion_bar(val_2004, val_2024, x_label, output_path=None):
 
     # Gráfico de barras para 2024
     bars_2024 = axs[1].bar(val_2024.index, val_2024.values, color='salmon')
-    axs[1].set_title('Composición en 2024', fontsize=14)  # título del gráfico con tamaño más grande
-    axs[1].set_xlabel(x_label, fontsize=12)  # título eje x con tamaño más grande
-    axs[1].set_ylim(0, 100)  # establecer los límites del eje y entre 0 y 100
-    axs[1].set_xticks([])  # quitar números del eje x
+    axs[1].set_title('Composición en 2024', fontsize=14)  # título del gráfico 
+    axs[1].set_xlabel(x_label, fontsize=12)  # título eje x 
+    axs[1].set_ylim(0, 100)  # establecemos los límites del eje y entre 0 y 100
+    axs[1].set_xticks([])  # sacamos números del eje x
 
     for bar, value, label in zip(bars_2024, val_2024.values, ["No", "Sí"]):
         axs[1].text(
@@ -344,10 +341,57 @@ def composicion_bar(val_2004, val_2024, x_label, output_path=None):
 # Graficamos las composiciones por año
 composicion_bar(data_2004_counts1, data_2024_counts1, 'Subsidios', "./output/subsidios.png")
 composicion_bar(data_2004_counts2, data_2024_counts2, 'Préstamos', "./output/ahorros.png")
-composicion_bar(data_2004_counts3, data_2024_counts3, 'Pisos', "./output/piso.png")
-composicion_bar(data_2004_counts4, data_2024_counts4, 'Espacio de Trabajo', "./output/trabajo.png")
-composicion_bar(data_2004_counts5, data_2024_counts5, 'Villa de Emergencia', "./output/villa.png")
+composicion_bar(data_2004_counts3, data_2024_counts3, 'Espacio de Trabajo', "./output/trabajo.png")
+composicion_bar(data_2004_counts4, data_2024_counts4, 'Villa de Emergencia', "./output/villa.png")
 
+# Variable Pisos. Más de 2 categorías
+# 5) Pisos 
+data_2004_counts5 = df_clean[df_clean['año'] == "2004"]['iv3'].value_counts(normalize=True) * 100 
+data_2024_counts5 = df_clean[df_clean['año'] == "2024"]['iv3'].value_counts(normalize=True) * 100
+
+# Definimos función
+def composicion_barras_3categorias(data_2004_counts, data_2024_counts, labels, output_path=None):
+    # Definir la posición de las barras
+    x = np.arange(len(labels))  # la ubicación de las categorías en el eje x
+    width = 0.35  # el ancho de las barras
+
+    fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # creamos una figura con 2 subplots (uno al lado del otro)
+
+    # Gráfico de barras para 2004
+    bars_2004 = axs[0].bar(x - width/2, data_2004_counts, width, color='skyblue')
+    axs[0].set_title('Composición en 2004', fontsize=16)  # Título 
+    axs[0].set_ylabel('Porcentaje', fontsize=14)  # Título del eje Y
+    axs[0].set_xticks(x)
+    axs[0].set_xticklabels(labels, fontsize=12)  # Etiquetas del eje X
+    axs[0].set_ylim(0, 100)  # Limitamos el eje y entre 0 y 100
+
+    # Agregamos texto con los porcentajes sobre las barras para 2004
+    for bar in bars_2004:
+        height = bar.get_height()
+        axs[0].text(bar.get_x() + bar.get_width() / 2, height + 2, f'{height:.1f}%', ha='center', fontsize=10)
+
+    # Gráfico de barras para 2024
+    bars_2024 = axs[1].bar(x + width/2, data_2024_counts, width, color='salmon')
+    axs[1].set_title('Composición en 2024', fontsize=16)  # Título más grande
+    axs[1].set_ylabel('Porcentaje', fontsize=14)  # Título del eje Y más grande
+    axs[1].set_xticks(x)
+    axs[1].set_xticklabels(labels, fontsize=12)  # Etiquetas del eje X más grandes
+    axs[1].set_ylim(0, 100)  # Limitar el eje y entre 0 y 100
+
+    # Agregamos texto con los porcentajes sobre las barras para 2024
+    for bar in bars_2024:
+        height = bar.get_height()
+        axs[1].text(bar.get_x() + bar.get_width() / 2, height + 2, f'{height:.1f}%', ha='center', fontsize=10)
+
+    plt.tight_layout()
+
+    if output_path:
+        plt.savefig(output_path)
+    plt.show()
+
+# Ejemplo de uso con datos ficticios
+labels = ['Baldosa', 'Cemento', 'Tierra']
+composicion_barras_3categorias(data_2004_counts5, data_2024_counts5, labels, "./output/pisos.png")
 
 # %% 1.6. Tasa de desocupación para el aglomerado
 
