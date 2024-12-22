@@ -238,7 +238,6 @@ for col in other_columns:
     df_clean[col] = pd.Categorical(df_clean[col])
 df_clean.info(verbose = True)# verbose imprime resumen completo
 
-
 # Generamos dummys para variables con más de una categoría 
 # Primero pasamos a formato categórico a las variables
 categoricas = ["cobertura_medica", "nivel_ed", "estado_civil", "iv3", "iv4", "iv5", "iv6", "iv7", "iv8", "iv9", "iv10", "iv11", "ii3", "iv12_3"]
@@ -281,23 +280,74 @@ df_clean['ingreso_no_laboral_pc'] = df_clean['sum_t_vi_hogar'] / df_clean['miemb
 
 # %% 1.5. Estadísticas descriptivas
 
-# Supongamos que ya tienes tu DataFrame 'df_clean'
-# Seleccionar las variables que quieres incluir en la tabla
-variables = ['cantidad_inactivos', 'hacinamiento', 'ingreso_no_laboral_pc', 'genero', 'edad']
-df_subset = df_clean[variables]
+# Calculamos para cada año los porcentajes para cada variable 
+# 1) Subsidios 
+data_2004_counts1 = df_clean[df_clean['año'] == "2004"]['v5'].value_counts(normalize=True) * 100 
+data_2024_counts1 = df_clean[df_clean['año'] == "2024"]['v5'].value_counts(normalize=True) * 100
+# 2) Ahorros 
+data_2004_counts2 = df_clean[df_clean['año'] == "2004"]['v15'].value_counts(normalize=True) * 100 
+data_2024_counts2 = df_clean[df_clean['año'] == "2024"]['v15'].value_counts(normalize=True) * 100
+# 3) Pisos 
+data_2004_counts3 = df_clean[df_clean['año'] == "2004"]['iv3'].value_counts(normalize=True) * 100 
+data_2024_counts3 = df_clean[df_clean['año'] == "2024"]['iv3'].value_counts(normalize=True) * 100
+# 4) Lugar de trabajo 
+df_clean = df_clean[df_clean['ii3'] != 0]
+data_2004_counts4 = df_clean[df_clean['año'] == "2004"]['ii3'].value_counts(normalize=True) * 100 
+data_2024_counts4 = df_clean[df_clean['año'] == "2024"]['ii3'].value_counts(normalize=True) * 100
+# 5) Villa de emergencia 
+data_2004_counts5 = df_clean[df_clean['año'] == "2004"]['iv12_3'].value_counts(normalize=True) * 100 
+data_2024_counts5 = df_clean[df_clean['año'] == "2024"]['iv12_3'].value_counts(normalize=True) * 100
 
-# Calcular estadísticas descriptivas
-descriptives = df_subset.describe(include='all').transpose()
+# Armamos una función para hacer gráficos de barras que comparen entre años
+def composicion_bar(val_2004, val_2024, x_label, output_path=None):
+    fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # creamos una figura con 2 subplots 
 
-descriptives
+    # Gráfico de barras para 2004
+    bars_2004 = axs[0].bar(val_2004.index, val_2004.values, color='skyblue')
+    axs[0].set_title('Composición en 2004', fontsize=13)  # título del gráfico con tamaño más grande
+    axs[0].set_xlabel(x_label, fontsize=12)  # título eje x con tamaño más grande
+    axs[0].set_ylabel('Porcentaje', fontsize=12)  # título eje y con tamaño más grande
+    axs[0].set_ylim(0, 100)  # establecer los límites del eje y entre 0 y 100
+    axs[0].set_xticks([])  # quitar números del eje x
 
-# Crear la nueva variable
-# df_clean['diferencia_ingreso'] = df_clean['ipcf'] - df_clean['ingreso_no_laboral_pc']
-# Calcular estadísticas descriptivas de la nueva variable
-# estadisticas_diferencia = df_clean['diferencia_ingreso'].describe()
-# Imprimir las estadísticas descriptivas
-# print("Estadísticas descriptivas de la variable 'diferencia_ingreso':")
-# print(estadisticas_diferencia)
+    for bar, value, label in zip(bars_2004, val_2004.values, ["No", "Sí"]):
+        axs[0].text(
+            bar.get_x() + bar.get_width() / 2, 
+            value + 2, 
+            f'{label}: {value:.1f}%', 
+            ha='center', 
+            fontsize=10  # tamaño de la fuente de los textos sobre las barras
+        )
+
+    # Gráfico de barras para 2024
+    bars_2024 = axs[1].bar(val_2024.index, val_2024.values, color='salmon')
+    axs[1].set_title('Composición en 2024', fontsize=14)  # título del gráfico con tamaño más grande
+    axs[1].set_xlabel(x_label, fontsize=12)  # título eje x con tamaño más grande
+    axs[1].set_ylim(0, 100)  # establecer los límites del eje y entre 0 y 100
+    axs[1].set_xticks([])  # quitar números del eje x
+
+    for bar, value, label in zip(bars_2024, val_2024.values, ["No", "Sí"]):
+        axs[1].text(
+            bar.get_x() + bar.get_width() / 2, 
+            value + 2, 
+            f'{label}: {value:.1f}%', 
+            ha='center', 
+            fontsize=10  # tamaño de la fuente de los textos sobre las barras
+        )
+
+    plt.tight_layout()
+
+    if output_path:
+        plt.savefig(output_path)
+    plt.show() 
+
+# Graficamos las composiciones por año
+composicion_bar(data_2004_counts1, data_2024_counts1, 'Subsidios', "./output/subsidios.png")
+composicion_bar(data_2004_counts2, data_2024_counts2, 'Préstamos', "./output/ahorros.png")
+composicion_bar(data_2004_counts3, data_2024_counts3, 'Pisos', "./output/piso.png")
+composicion_bar(data_2004_counts4, data_2024_counts4, 'Espacio de Trabajo', "./output/trabajo.png")
+composicion_bar(data_2004_counts5, data_2024_counts5, 'Villa de Emergencia', "./output/villa.png")
+
 
 # %% 1.6. Tasa de desocupación para el aglomerado
 
@@ -336,8 +386,8 @@ desocupada = pd.DataFrame(
 respondieron = pd.concat([respondieron, desocupada], axis=1) # Le agregamos la columna al df
 
 # Definimos las columnas de interés
-columnas = ["año","codusu","nro_hogar","componente","pondera","genero", "edad", "estado_civil", "cobertura_medica","parentesco",
-            "nivel_ed", "estado", "cat_inac", "ipcf","v2", "v5","v6","v7","v8","v9","v10","v11","v12","v13","v14","v15",
+columnas = ["genero", "edad", "estado_civil", "cobertura_medica","parentesco",
+            "nivel_ed", "estado", "ipcf","v2", "v5","v6","v7","v8","v9","v10","v11","v12","v13","v14","v15",
             "v16", "v17","v18","v19_a","v19_b","iv2", "t_vi", "iv3", "iv4", "iv5", "iv6", "iv7", "iv8", "iv9", "iv10", 
             "iv11", "ii3", "iv12_3", "hacinamiento", "ingreso_no_laboral_pc", "cantidad_inactivos"]
 
