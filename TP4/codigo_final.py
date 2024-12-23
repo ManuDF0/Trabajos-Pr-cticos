@@ -509,23 +509,69 @@ def plot_roc(fpr, tpr, auc, year, penalty):
     plt.savefig(f'./output/roc_{year}_{penalty}.png')
     plt.show()
     
-# %% 2.4 Estimando los modelos
+# %% 2.4 Estimando los modelos y obteniendo las métrocas de rendimiento.
+
+    
+# 1) Generar la lista de resultados
+results = []
 
 # Para 2004
 for p in ['l1', 'l2']:
-    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(x_train_2004, x_test_2004, y_train_2004, y_test_2004, p)
-    print(cm)
-    print(auc)
-    print(accuracy)
-    plot_roc(fpr, tpr, auc, 2004, p)
+    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(
+        x_train_2004, x_test_2004, y_train_2004, y_test_2004, p
+    )
+    # cm suele ser de la forma [[TN, FP], [FN, TP]]
+    results.append({
+        'year': 2004,
+        'penalty': p,
+        'cm': cm,
+        'auc': auc,
+        'acc': accuracy
+    })
 
 # Para 2024
 for p in ['l1', 'l2']:
-    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(x_train_2024, x_test_2024, y_train_2024, y_test_2024, p)
-    print(cm)
-    print(auc)
-    print(accuracy)
-    plot_roc(fpr, tpr, auc, 2024, p)
+    cm, auc, accuracy, fpr, tpr = logit_penalty_eval(
+        x_train_2024, x_test_2024, y_train_2024, y_test_2024, p
+    )
+    results.append({
+        'year': 2024,
+        'penalty': p,
+        'cm': cm,
+        'auc': auc,
+        'acc': accuracy
+    })
+
+# 2) Imprimir el código LaTeX de la tabla en pantalla (stdout).
+#    Si deseas guardarlo en un archivo, cambia los 'print' por escrituras en un archivo .tex.
+print(r"\begin{table}[H]")
+print(r"\centering")
+print(r"\begin{tabular}{cccccccc}")
+print(r"\hline")
+print(r"Año & Penalidad & TN & FP & FN & TP & AUC & Accuracy \\")
+print(r"\hline")
+
+for item in results:
+    year = item['year']
+    penalty = item['penalty']
+    cm = item['cm']   # [[TN, FP], [FN, TP]]
+    auc_val = item['auc']
+    acc_val = item['acc']
+    
+    tn, fp = cm[0]
+    fn, tp = cm[1]
+    
+    # Ajusta el número de decimales de AUC y Accuracy si lo deseas
+    print(r"{} & {} & {} & {} & {} & {} & {:.3f} & {:.3f} \\".format(
+        year, penalty, tn, fp, fn, tp, auc_val, acc_val
+    ))
+
+print(r"\hline")
+print(r"\end{tabular}")
+print(r"\caption{Resultados de la evaluación: matriz de confusión, AUC y Accuracy.}")
+print(r"\label{tab:resultados}")
+print(r"\end{table}")
+
     
 # %% 2.5 Grilla de lambdas 
 
@@ -614,7 +660,7 @@ def lasso_logistic_cv(hyperparams, X_train, y_train):
 	zero_coef_proportions = {param: [] for param in hyperparams} # Armamos un diccionario para guardar las proporciones de coeficientes nulos de cada fold
 	
 	for param in hyperparams: # Iteramos por cada valor de alpha
-		model = LogisticRegression(penalty='l1', solver='saga', C=1/param, max_iter=5000, n_jobs= 7) # Definimos el modelo
+		model = LogisticRegression(penalty='l1', solver='saga', C=1/param, max_iter=7000, n_jobs= 7) # Definimos el modelo
 		fold_mse = [] # Armamos una lista para guardar los mse de cada fold
 		fold_zero_coef_proportions = [] # Armamos una lista para guardar las proporciones de coeficientes nulos de cada fold
 		
@@ -662,7 +708,7 @@ line_prop(promedios, 2024)
 
 # Ahora queremos ver cuales son las variables nulas para cada modelo LASSO con el alpha optimo
 def Lasso_logit(x_train, y_train, x_test, y_test, alpha):
-    model = LogisticRegression(penalty='l1', solver='saga', C=1/alpha, max_iter=5000, n_jobs=7).fit(x_train, y_train)
+    model = LogisticRegression(penalty='l1', solver='saga', C=1/alpha, max_iter=7000, n_jobs=7).fit(x_train, y_train)
     var_names = x_train.columns
     coefs = model.coef_[0]
     mse = mean_squared_error(y_test, model.predict(x_test)) # También guardamos el mse para evaluar el modelo
@@ -671,7 +717,7 @@ def Lasso_logit(x_train, y_train, x_test, y_test, alpha):
 # %% 2.6-2.7 Resultados LASSO 2004
 
 # Para 2004
-coefs, mse = Lasso_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 1) 
+coefs, mse = Lasso_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 10)
 lasso_coefs = pd.DataFrame(coefs, index= [0]).melt() # Guardamos los coeficientes en un df para 2004
 
 print(f'El ECM para LASSO en 2004 es: {mse}') # Imprimimos el mse para 2004
@@ -679,9 +725,11 @@ print(f'El ECM para LASSO en 2004 es: {mse}') # Imprimimos el mse para 2004
 # %%  2.6-2.7 Resultados LASSO 2024
 
 # Para 2024
-coefs, mse = Lasso_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 100) # Hacemos lo mismo con los coefs de 2024
+coefs, mse = Lasso_logit(x_train_2024, y_train_2024, x_test_2024, y_test_2024, 10) # Hacemos lo mismo con los coefs de 2024
 lasso_coefs = pd.concat([lasso_coefs, pd.DataFrame(coefs, index= [0]).melt()['value']], axis= 1) # Juntamos los coeficientes de ambos años
 lasso_coefs.columns = ['variable', '2004', '2024'] # Renombramos las columnas
+lasso_coefs.to_latex('./output/lasso_coefs.tex', index= False) # Guardamos los coeficientes en un archivo latex
+
 
 print(f'El ECM para LASSO en 2024 es: {mse}')
 
@@ -695,7 +743,7 @@ def Ridge_logit(x_train, y_train, x_test, y_test, alpha):
 
 # %% 2.7 Resultados Ridge 2004
 
-mse = Ridge_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 0.1) # Calculamos el mse para Ridge en 2004
+mse = Ridge_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 100) # Calculamos el mse para Ridge en 2004
 print(f'El ECM para Ridge en 2004 es: {mse}')
 
 
