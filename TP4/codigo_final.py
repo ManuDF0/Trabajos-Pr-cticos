@@ -37,14 +37,14 @@ pd.options.display.float_format = '{:.2f}'.format
 
 # configurando directorio de trabajo
 #os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
-os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
+#os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
 
 # %% importamos datos
 
-h_2024 = pd.read_excel("input/usu_hogar_T124.xlsx")
-i_2024 = pd.read_excel("input/usu_individual_T124.xlsx")
-h_2004 = pd.read_stata("input/Hogar_t104.dta", convert_categoricals=False)
-i_2004 = pd.read_stata("input/Individual_t104.dta", convert_categoricals=False)
+h_2024 = pd.read_excel("./input/usu_hogar_T124.xlsx")
+i_2024 = pd.read_excel("./input/usu_individual_T124.xlsx")
+h_2004 = pd.read_stata("./input/Hogar_t104.dta", convert_categoricals=False)
+i_2004 = pd.read_stata("./input/Individual_t104.dta", convert_categoricals=False)
 
 # %% filtramos Bahía Blanca en 2024
 
@@ -196,8 +196,8 @@ fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(x=data_x, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'color': 'red', 'alpha': 0.5})
 ax.set_title('')
 ax.set_xlabel('Ingreso Per Cápita Familiar (en millones de pesos)', fontsize=14)
+fig.savefig("./output/boxplot_ipcf.png")
 plt.show()
-#fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_ipcf.png")
 
 # 2. Ingreso no laboral per cápita 
 # Nos aseguramos de que 't_vi' esté en formato correcto
@@ -207,8 +207,9 @@ fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(x=data_x2, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'color': 'red', 'alpha': 0.5})
 ax.set_title('')
 ax.set_xlabel('Ingreso No Laboral Per Cápita (en millones de pesos)', fontsize=14)
+fig.savefig("./output/boxplot_tvi.png")
 plt.show()
-#fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_tvi.png")
+
 
 # 3. Edad
 # Nos aseguramos de que 't_vi' esté en formato correcto
@@ -218,8 +219,8 @@ fig, ax = plt.subplots(figsize=(8, 4))
 sns.boxplot(x=data_x3, ax=ax, color='yellowgreen', flierprops={'marker': 'o', 'color': 'red', 'alpha': 0.5})
 ax.set_title('')
 ax.set_xlabel('Edad', fontsize=14)
+fig.savefig("./output/boxplot_edad.png")
 plt.show()
-#fig.savefig("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4/output/boxplot_edad.png")
 
 # %% 1.3 Generamos dummys para variables categóricas 
 
@@ -528,6 +529,8 @@ for p in ['l1', 'l2']:
         'auc': auc,
         'acc': accuracy
     })
+    
+    plot_roc(fpr, tpr, auc, 2004, p)
 
 # Para 2024
 for p in ['l1', 'l2']:
@@ -541,6 +544,8 @@ for p in ['l1', 'l2']:
         'auc': auc,
         'acc': accuracy
     })
+    
+    plot_roc(fpr, tpr, auc, 2024, p)
 
 # 2) Imprimir el código LaTeX de la tabla en pantalla (stdout).
 #    Si deseas guardarlo en un archivo, cambia los 'print' por escrituras en un archivo .tex.
@@ -743,7 +748,7 @@ def Ridge_logit(x_train, y_train, x_test, y_test, alpha):
 
 # %% 2.7 Resultados Ridge 2004
 
-mse = Ridge_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 100) # Calculamos el mse para Ridge en 2004
+mse = Ridge_logit(x_train_2004, y_train_2004, x_test_2004, y_test_2004, 10) # Calculamos el mse para Ridge en 2004
 print(f'El ECM para Ridge en 2004 es: {mse}')
 
 
@@ -772,3 +777,5 @@ print(f'El ECM para Ridge en 2004 es: {mse}')
 
 
 
+
+# %%
