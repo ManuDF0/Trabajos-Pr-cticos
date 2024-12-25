@@ -36,7 +36,7 @@ from typing import Literal
 pd.options.display.float_format = '{:.2f}'.format
 
 # configurando directorio de trabajo
-#os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
+os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
 #os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
 
 # %% importamos datos
@@ -299,14 +299,6 @@ data_2024_counts4 = df_clean[df_clean['año'] == "2024"]['iv12_3'].value_counts(
 
 
 
-
-
-
-
-
-
-
-
 # Armamos una función para hacer gráficos de barras que comparen entre años para cuando hay 2 categorías 
 def composicion_bar(val_2004, val_2024, x_label, output_path=None):
     fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # creamos una figura con 2 subplots 
@@ -443,7 +435,7 @@ respondieron = pd.concat([respondieron, desocupada], axis=1) # Le agregamos la c
 
 # Definimos las columnas de interés
 columnas = ["genero", "edad", "estado_civil", "cobertura_medica","parentesco",
-            "nivel_ed", "estado", "ipcf","v2", "v5","v6","v7","v8","v9","v10","v11","v12","v13","v14","v15",
+            "nivel_ed", "ipcf","v2", "v5","v6","v7","v8","v9","v10","v11","v12","v13","v14","v15",
             "v16", "v17","v18","v19_a","v19_b","iv2", "t_vi", "iv3", "iv4", "iv5", "iv6", "iv7", "iv8", "iv9", "iv10", 
             "iv11", "ii3", "iv12_3", "hacinamiento", "ingreso_no_laboral_pc", "cantidad_inactivos"]
 
@@ -467,11 +459,13 @@ x_train_2024, x_test_2024, y_train_2024, y_test_2024 = train_test_split(x_2024, 
 # Para regularización hace falta estandarizar primero las variables, para que no pondere más por una cuestión de varianza
 # Estandarizamos las variables
 sc = StandardScaler()
-x_train_2004 = pd.DataFrame(sc.fit_transform(x_train_2004), index= x_train_2004, columns= x_train_2004.columns)
-x_train_2024 = pd.DataFrame(sc.fit_transform(x_train_2024), index= x_train_2024, columns= x_train_2024.columns)
-x_test_2004 = pd.DataFrame(sc.fit_transform(x_test_2004), index= x_test_2004, columns= x_test_2004.columns)
-x_test_2024 = pd.DataFrame(sc.fit_transform(x_test_2024), index= x_test_2024, columns= x_test_2024.columns)
+x_train_2004 = pd.DataFrame(sc.fit_transform(x_train_2004), index= x_train_2004.index, columns= x_train_2004.columns)
+x_train_2024 = pd.DataFrame(sc.fit_transform(x_train_2024), index= x_train_2024.index, columns= x_train_2024.columns)
+x_test_2004 = pd.DataFrame(sc.fit_transform(x_test_2004), index= x_test_2004.index, columns= x_test_2004.columns)
+x_test_2024 = pd.DataFrame(sc.fit_transform(x_test_2024), index= x_test_2024.index, columns= x_test_2024.columns)
 
+
+x_train_2004.info(verbose = True)
 # %% 2.4. Implementamos las penalidades de LASSo y Ridge para la regresión Logística
 
 # Armamos una función que estima un modelo logit con distintas penalidades y devuelve las métricas para evaluarlo
@@ -778,4 +772,3 @@ print(f'El ECM para Ridge en 2004 es: {mse}')
 
 
 
-# %%
