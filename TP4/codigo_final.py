@@ -37,7 +37,7 @@ pd.options.display.float_format = '{:.2f}'.format
 
 # configurando directorio de trabajo
 # os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
-# os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
+os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
 
 # %% importamos datos
 
@@ -289,7 +289,7 @@ data_2024_counts1 = df_clean[df_clean['año'] == "2024"]['v5'].value_counts(norm
 data_2004_counts2 = df_clean[df_clean['año'] == "2004"]['v15'].value_counts(normalize=True) * 100 
 data_2024_counts2 = df_clean[df_clean['año'] == "2024"]['v15'].value_counts(normalize=True) * 100
 # 3) Lugar de trabajo 
-df_clean = df_clean[df_clean['ii3'] != 0]
+df_clean = df_clean[df_clean['ii3'] != 0] # nos quedamos con los valores distintos a cero 
 data_2004_counts3 = df_clean[df_clean['año'] == "2004"]['ii3'].value_counts(normalize=True) * 100 
 data_2024_counts3 = df_clean[df_clean['año'] == "2024"]['ii3'].value_counts(normalize=True) * 100
 # 4) Villa de emergencia 
@@ -398,17 +398,24 @@ composicion_barras_3categorias(data_2004_counts5, data_2024_counts5, labels, "./
 
 # %% 1.6. Tasa de desocupación para el aglomerado
 
-# Crear la variable 'desocupado' en función de la columna 'estado'
-df_clean['desocupado'] = (df_clean['estado'] == 2).astype(int)
+# Nos quedamos solo con las observaciones de 2024 
+df_2024_desocupacion = df_clean[df_clean['año'] == "2024"]
 
-df_hogares = df_clean[df_clean["parentesco"]==1]
+# Creamos la variable 'desocupado' en función de la columna 'estado'
+df_2024_desocupacion['desocupado'] = (df_2024_desocupacion['estado'] == 2).astype(int)
 
-# Calcular la tasa de desocupación a nivel general
-hogares_totales = df_hogares['pondera'].sum()
+# Nos quedamos solo con los jefe de hogar (una observación por hogar)
+df_hogares = df_2024_desocupacion[df_2024_desocupacion["parentesco"]==1]
+
+# Calcular la tasa de desocupación a nivel general: 
+# Sumamos los hogares y lo expandimos con el pondera
+hogares_totales = df_hogares['pondera'].sum() 
+# Sumamos la cantidad de hogares con el jefe de hogar desocupado expandido con el pondera
 hogares_desocupados = df_hogares.loc[df_hogares['desocupado'] == 1, 'pondera'].sum()
+# Calculamos la tasa de desocupación
 tasa_desocupacion = (hogares_desocupados / hogares_totales) * 100
 
-# Mostrar el resultado
+# Mostramos el resultado
 print(f"Hogares totales ponderados: {hogares_totales}")
 print(f"Hogares desocupados ponderados: {hogares_desocupados}")
 print(f"Tasa de desocupación: {tasa_desocupacion:.2f}%")
