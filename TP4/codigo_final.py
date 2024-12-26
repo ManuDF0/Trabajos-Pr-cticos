@@ -392,7 +392,7 @@ def composicion_barras_3categorias(data_2004_counts, data_2024_counts, labels, o
         plt.savefig(output_path)
     plt.show()
 
-# Ejemplo de uso con datos ficticios
+# Establecemos labels 
 labels = ['Baldosa', 'Cemento', 'Tierra']
 composicion_barras_3categorias(data_2004_counts5, data_2024_counts5, labels, "./output/pisos.png")
 
