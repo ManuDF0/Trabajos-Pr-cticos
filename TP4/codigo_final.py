@@ -296,57 +296,56 @@ data_2024_counts3 = df_clean[df_clean['año'] == "2024"]['ii3'].value_counts(nor
 data_2004_counts4 = df_clean[df_clean['año'] == "2004"]['iv12_3'].value_counts(normalize=True) * 100 
 data_2024_counts4 = df_clean[df_clean['año'] == "2024"]['iv12_3'].value_counts(normalize=True) * 100
 
+# Convertimos a dataframes 2004 
+# Subsidios 
+subsidios2004 = data_2004_counts1.reset_index()
+subsidios2004.columns = ['A', 'Subsidios 2004'] 
+# Ahorros 
+ahorros2004 = data_2004_counts2.reset_index()
+ahorros2004.columns = ['A', 'Ahorros 2004'] 
+# Lugar de trabajo 
+trabajo2004 = data_2004_counts3.reset_index()
+trabajo2004.columns = ['A', 'Lugar de trabajo 2004'] 
+trabajo2004 = trabajo2004.drop(trabajo2004.index[-1]) # eliminamos la fila del 0 
+# Villa de emergencia 
+emergencia2004 = data_2004_counts4.reset_index()
+emergencia2004.columns = ['A', 'Villa de Emergencia 2004']
+# Mergeamos todos los datasets de 2004 
+merge_2004 = pd.merge(subsidios2004, ahorros2004, on='A', how='inner')
+merge_2004 = pd.merge(merge_2004, trabajo2004, on='A', how='inner')
+merge_2004 = pd.merge(merge_2004, emergencia2004, on='A', how='inner')
+# Agregamos una columna que se llama año 
+merge_2004['Año'] = 2004
+# Vemos el dataframe 2004 final 
+print(merge_2004)
 
+# Convertimos a dataframes 2024 
+# Subsidios 
+subsidios2024 = data_2024_counts1.reset_index()
+subsidios2024.columns = ['A', 'Subsidios 2024'] 
+# Ahorros 
+ahorros2024 = data_2024_counts2.reset_index()
+ahorros2024.columns = ['A', 'Ahorros 2024'] 
+# Lugar de trabajo 
+trabajo2024 = data_2024_counts3.reset_index()
+trabajo2024.columns = ['A', 'Lugar de trabajo 2024'] 
+trabajo2024 = trabajo2024.drop(trabajo2024.index[-1]) # eliminamos la fila del 0 
+# Villa de emergencia 
+emergencia2024 = data_2024_counts4.reset_index()
+emergencia2024.columns = ['A', 'Villa de Emergencia 2024']
+# Mergeamos todos los datasets de 2024 
+merge_2024 = pd.merge(subsidios2024, ahorros2024, on='A', how='inner')
+merge_2024 = pd.merge(merge_2024, trabajo2024, on='A', how='inner')
+merge_2024 = pd.merge(merge_2024, emergencia2024, on='A', how='inner')
+# Agregamos una columna que se llama año 
+merge_2024['Año'] = 2024
+# Vemos el dataframe 2024 final 
+print(merge_2024)
 
-
-# Armamos una función para hacer gráficos de barras que comparen entre años para cuando hay 2 categorías 
-def composicion_bar(val_2004, val_2024, x_label, output_path=None):
-    fig, axs = plt.subplots(1, 2, figsize=(12, 6))  # creamos una figura con 2 subplots 
-
-    # Gráfico de barras para 2004
-    bars_2004 = axs[0].bar(val_2004.index, val_2004.values, color='skyblue')
-    axs[0].set_title('Composición en 2004', fontsize=13)  # título del gráfico 
-    axs[0].set_xlabel(x_label, fontsize=12)  # título eje x con tamaño más grande
-    axs[0].set_ylabel('Porcentaje', fontsize=12)  # título eje y c
-    axs[0].set_ylim(0, 100)  # establecemos los límites del eje y entre 0 y 100
-    axs[0].set_xticks([])  # quitar números del eje x
-
-    for bar, value, label in zip(bars_2004, val_2004.values, ["No", "Sí"]):
-        axs[0].text(
-            bar.get_x() + bar.get_width() / 2, 
-            value + 2, 
-            f'{label}: {value:.1f}%', 
-            ha='center', 
-            fontsize=10  # tamaño de la fuente de los textos sobre las barras
-        )
-
-    # Gráfico de barras para 2024
-    bars_2024 = axs[1].bar(val_2024.index, val_2024.values, color='salmon')
-    axs[1].set_title('Composición en 2024', fontsize=14)  # título del gráfico 
-    axs[1].set_xlabel(x_label, fontsize=12)  # título eje x 
-    axs[1].set_ylim(0, 100)  # establecemos los límites del eje y entre 0 y 100
-    axs[1].set_xticks([])  # sacamos números del eje x
-
-    for bar, value, label in zip(bars_2024, val_2024.values, ["No", "Sí"]):
-        axs[1].text(
-            bar.get_x() + bar.get_width() / 2, 
-            value + 2, 
-            f'{label}: {value:.1f}%', 
-            ha='center', 
-            fontsize=10  # tamaño de la fuente de los textos sobre las barras
-        )
-
-    plt.tight_layout()
-
-    if output_path:
-        plt.savefig(output_path)
-    plt.show() 
-
-# Graficamos las composiciones por año
-composicion_bar(data_2004_counts1, data_2024_counts1, 'Subsidios', "./output/subsidios.png")
-composicion_bar(data_2004_counts2, data_2024_counts2, 'Préstamos', "./output/ahorros.png")
-composicion_bar(data_2004_counts3, data_2024_counts3, 'Espacio de Trabajo', "./output/trabajo.png")
-composicion_bar(data_2004_counts4, data_2024_counts4, 'Villa de Emergencia', "./output/villa.png")
+# Concatenamos ambos dataframes 
+dataframe_final = pd.concat([merge_2004, merge_2024], ignore_index=True)
+# Pasamos a Latex 
+latex_table = dataframe_final.to_latex(index=False, caption='Estadísticas descriptivas', label='estadisticas')
 
 # Variable Pisos. Más de 2 categorías
 # 5) Pisos 
