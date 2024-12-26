@@ -19,7 +19,6 @@ import os
 import seaborn as sns
 import statsmodels.api as sm     
 
-
 from stargazer.stargazer import Stargazer
 from sklearn.preprocessing import scale
 from sklearn.preprocessing import StandardScaler
@@ -37,7 +36,7 @@ pd.options.display.float_format = '{:.2f}'.format
 
 # configurando directorio de trabajo
 # os.chdir("/Users/diegofmeijide/Documents/GitHub/Trabajos-Pr-cticos/TP4")
-os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
+# os.chdir("C:/Users/sofia/Desktop/Maestría/Tercer trimestre/Machine Learning/Trabajos-Pr-cticos/TP4")
 
 # %% importamos datos
 
